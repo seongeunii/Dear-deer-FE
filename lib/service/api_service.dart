@@ -45,6 +45,16 @@ class ApiService extends CustomGetConnect implements GetxService {
   /// Request: { "accessToken": "<kakao access token>" }
   /// Response(200): { "customToken": "<firebase custom token>" }
   Future<String?> exchangeKakaoAccessToken(String accessToken) async {
+    final requestBody = jsonEncode({'accessToken': accessToken});
+    final requestHeaders = {'Content-Type': 'application/json'};
+
+    debugPrint('--- [iOS REQUEST DEBUG START] ---');
+    debugPrint('URL: /auth/kakao');
+    debugPrint('Method: POST');
+    debugPrint('Headers: $requestHeaders');
+    debugPrint('Body: $requestBody');
+    debugPrint('--- [iOS REQUEST DEBUG END] ---');
+
     final res = await post(
       '/auth/kakao',
       jsonEncode({'accessToken': accessToken}),
