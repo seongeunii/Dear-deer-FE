@@ -21,6 +21,7 @@ class CustomCalendarWidget extends StatefulWidget {
 
 class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   late DateTime focusedDay;
+
   final TextStyle _commonTextStyle = TextStyle(color: AppColors.G_06);
 
   @override
@@ -39,7 +40,9 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       calendarFormat: CalendarFormat.month,
       selectedDayPredicate: (day) => isSameDay(day, widget.selectedDate),
       onDaySelected: (selected, focused) {
-        setState(() => focusedDay = focused);
+        setState(() {
+          focusedDay = focused;
+        });
         widget.onDateSelected(selected);
       },
       headerStyle: HeaderStyle(

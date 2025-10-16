@@ -24,14 +24,27 @@ class CalendarDayBox extends StatelessWidget {
     required this.events,
   }) : super(key: key);
 
+  static const Map<String, Color> categoryColors = {
+    '약속': Colors.red,
+    '팝업': Colors.green,
+    '티켓팅&예약': Colors.yellow,
+    '기타': Colors.black,
+  };
+
+  static const Map<String, int> categoryPriority = {
+    '약속': 1,
+    '팝업': 2,
+    '티켓팅&예약': 3,
+    '기타': 4,
+  };
+
   @override
   Widget build(BuildContext context) {
-    // 정렬: 전역 우선순위 사용
-    final sorted = List<CalendarEvent>.from(events)
-      ..sort((a, b) => (kCategoryPriority[a.category] ?? 99)
-          .compareTo(kCategoryPriority[b.category] ?? 99));
+    final sortedEvents = List<CalendarEvent>.from(events)
+      ..sort((a, b) => (categoryPriority[a.category] ?? 100)
+          .compareTo(categoryPriority[b.category] ?? 100));
 
-    final isChristmas = (date.month == 12 && date.day == 25);
+    final isSpecialDate = date.month == 12 && date.day == 25;
 
     return GestureDetector(
       onTap: () => onTap(date),
@@ -39,86 +52,95 @@ class CalendarDayBox extends StatelessWidget {
         width: 34.w,
         height: 48.h,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isPast ? const Color(0xFFDBB586) : Colors.white,
           borderRadius: BorderRadius.circular(6.r),
         ),
         child: Stack(
           children: [
-            // 지난 날짜 반투명 오버레이
-            if (isPast)
-              Positioned.fill(
+            if (isSelected)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
                 child: Container(
+                  clipBehavior: Clip.hardEdge,
+                  height: 7.h,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8C6D4D).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6.r),
+                    color: AppColors.mainRed,
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(6.r)),
+                  ),
+                ),
+              )
+            else if (isToday)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: 7.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.G_04,
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(6.r)),
                   ),
                 ),
               ),
-
-            // 상단 바 (선택: 빨강 / 오늘: 회색)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 7.h,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.mainRed
-                      : (isToday ? AppColors.G_04 : Colors.transparent),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(6.r),
-                    topRight: Radius.circular(6.r),
-                  ),
-                ),
-              ),
-            ),
-
-            // 날짜 텍스트
             Align(
-              alignment: const Alignment(0, -0.35),
+              alignment: const Alignment(0, -0.4),
               child: Text(
                 '$day',
                 style: FontStyles.C1_bold_14.copyWith(
-                  color: isChristmas ? AppColors.mainRed : AppColors.G_07,
+                  color: isSpecialDate
+                      ? AppColors.mainRed
+                      : isPast
+                          ? AppColors.G_07.withOpacity(0.6)
+                          : AppColors.G_07,
                 ),
               ),
             ),
-
-            // 이벤트 점 3개까지
             Positioned(
               left: 0,
               right: 0,
               bottom: 5.h,
               child: Row(
+                mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ...sorted.take(3).toList().asMap().entries.map((entry) {
-                    return Container(
-                      width: 5.w,
-                      height: 5.w,
-                      margin: EdgeInsets.symmetric(horizontal: 2.w),
-                      decoration: BoxDecoration(
-                        color: kCategoryColors[entry.value.category] ??
-                            Colors.grey,
-                        shape: BoxShape.circle,
+                  ...sortedEvents.take(3).toList().asMap().entries.map((entry) {
+                    int idx = entry.key;
+                    CalendarEvent event = entry.value;
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        left: idx == 0 ? 0 : 2.w,
+                        right: idx == 2 ? 0 : 1.5.w,
+                      ),
+                      child: Container(
+                        width: 5.w,
+                        height: 5.w,
+                        decoration: BoxDecoration(
+                          color: categoryColors[event.category] ?? Colors.grey,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                     );
                   }),
-
-                  // 4개 이상: 오른쪽 반원 그라데이션
-                  if (sorted.length >= 4)
+                  if (sortedEvents.length > 3)
                     Padding(
-                      padding: EdgeInsets.only(left: 3.w),
+                      padding: EdgeInsets.only(left: 3.w, right: 0),
                       child: SizedBox(
                         width: 5.w,
                         height: 5.w,
                         child: Stack(
+                          clipBehavior: Clip.none,
                           children: [
                             Container(
+                              width: 5.w,
+                              height: 5.w,
                               decoration: BoxDecoration(
-                                color: kCategoryColors[sorted[3].category] ??
-                                    Colors.grey,
+                                color:
+                                    categoryColors[sortedEvents[3].category] ??
+                                        Colors.grey,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -128,12 +150,13 @@ class CalendarDayBox extends StatelessWidget {
                               bottom: 0,
                               child: Container(
                                 width: 3.w,
+                                height: 5.w,
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,
                                     colors: [
-                                      Colors.transparent,
+                                      Colors.white.withOpacity(0.0),
                                       Colors.white.withOpacity(0.85),
                                     ],
                                   ),

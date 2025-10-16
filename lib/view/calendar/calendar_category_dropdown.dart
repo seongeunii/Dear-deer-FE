@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:dear_deer_demo/data/app_color.dart';
 import 'package:dear_deer_demo/data/font_styles.dart';
-import 'package:dear_deer_demo/view/calendar/calendar_event.dart';
 
 class CategoryDropdown extends StatefulWidget {
   final String selectedCategory;
@@ -21,12 +20,20 @@ class CategoryDropdown extends StatefulWidget {
     "기타",
   ];
 
+  static final Map<String, Color> categoryColors = {
+    "약속": Colors.red,
+    "팝업": Colors.green,
+    "티켓팅&예약": Colors.yellow,
+    "기타": Colors.black,
+  };
+
   @override
   State<CategoryDropdown> createState() => _CategoryDropdownState();
 }
 
 class _CategoryDropdownState extends State<CategoryDropdown> {
   final double popupWidth = 184.w;
+  final double popupHeight = 170.h;
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +50,10 @@ class _CategoryDropdownState extends State<CategoryDropdown> {
       ),
       child: PopupMenuButton<String>(
         onSelected: widget.onCategorySelected,
-        constraints:
-            BoxConstraints(minWidth: popupWidth.w, maxWidth: popupWidth.w),
+        constraints: BoxConstraints(
+          minWidth: popupWidth.w,
+          maxWidth: popupWidth.w,
+        ),
         itemBuilder: (context) {
           final double itemHeight = 40.h;
           final double dividerHeight = 1.0;
@@ -72,7 +81,7 @@ class _CategoryDropdownState extends State<CategoryDropdown> {
                           width: 8.w,
                           height: 8.w,
                           decoration: BoxDecoration(
-                            color: kCategoryColors[cat],
+                            color: CategoryDropdown.categoryColors[cat],
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -90,8 +99,10 @@ class _CategoryDropdownState extends State<CategoryDropdown> {
                   padding: EdgeInsets.zero,
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child:
-                        Container(height: dividerHeight, color: AppColors.G_03),
+                    child: Container(
+                      height: dividerHeight,
+                      color: AppColors.G_03,
+                    ),
                   ),
                 ),
               );
@@ -105,7 +116,7 @@ class _CategoryDropdownState extends State<CategoryDropdown> {
               width: 8.w,
               height: 8.w,
               decoration: BoxDecoration(
-                color: kCategoryColors[widget.selectedCategory],
+                color: CategoryDropdown.categoryColors[widget.selectedCategory],
                 shape: BoxShape.circle,
               ),
             ),

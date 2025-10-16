@@ -11,6 +11,7 @@ class AddEvent extends StatefulWidget {
   final DateTime initialDate;
   final void Function(DateTime date, String title, String memo, String category)
       onAddEvent;
+
   const AddEvent({
     Key? key,
     required this.initialDate,
@@ -51,9 +52,9 @@ class _AddEventState extends State<AddEvent> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppColors.bgColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
             children: [
@@ -92,8 +93,10 @@ class _AddEventState extends State<AddEvent> {
           children: [
             GestureDetector(
               onTap: () => Navigator.pop(context),
-              child: Text("취소",
-                  style: FontStyles.S1_reg_13.copyWith(color: AppColors.G_05)),
+              child: Text(
+                "취소",
+                style: FontStyles.S1_reg_13.copyWith(color: AppColors.G_05),
+              ),
             ),
             GestureDetector(
               onTap: () {
@@ -105,10 +108,14 @@ class _AddEventState extends State<AddEvent> {
                     _memoController.text.trim(),
                     _selectedCategory,
                   );
+                } else {
+                  // 필요 시 빈 제목 처리
                 }
               },
-              child: Text("추가",
-                  style: FontStyles.S1_reg_13.copyWith(color: AppColors.G_05)),
+              child: Text(
+                "추가",
+                style: FontStyles.S1_reg_13.copyWith(color: AppColors.G_05),
+              ),
             ),
           ],
         ),
@@ -214,13 +221,17 @@ class _AddEventState extends State<AddEvent> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("카테고리",
-              style: FontStyles.B1_bold_15.copyWith(color: AppColors.G_05)),
+          Text(
+            "카테고리",
+            style: FontStyles.B1_bold_15.copyWith(color: AppColors.G_05),
+          ),
           CategoryDropdown(
             selectedCategory: _selectedCategory,
-            onCategorySelected: (value) => setState(() {
-              _selectedCategory = value;
-            }),
+            onCategorySelected: (value) {
+              setState(() {
+                _selectedCategory = value;
+              });
+            },
           ),
         ],
       ),

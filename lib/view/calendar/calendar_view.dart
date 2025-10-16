@@ -1,3 +1,4 @@
+import 'package:dear_deer_demo/data/today_ex.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,7 +14,7 @@ class CalendarView extends StatelessWidget {
   final Function(DateTime) onDayTap;
   final DateTime? selectedDate;
   final DateTime today;
-  final Future<List<CalendarEvent>> Function(DateTime) getEventsForDate;
+  final List<CalendarEvent> Function(DateTime) getEventsForDate;
 
   const CalendarView({
     Key? key,
@@ -30,54 +31,31 @@ class CalendarView extends StatelessWidget {
     final month = monthDate.month;
     final firstDay = DateTime(year, month, 1);
     final lastDay = DateTime(year, month + 1, 0).day;
-    final startWeekday = firstDay.weekday % 7; // Sun=0
+    final startWeekday = firstDay.weekday % 7;
 
     List<Widget> boxWidgets = [];
 
-    // 12월일 때만 "지난달 날짜"를 채워 넣기 (테스트 스펙)
     for (int i = 0; i < startWeekday; i++) {
-      if (month == 12) {
-        final prevMonthLastDay = DateTime(year, month, 0).day;
-        final dayNumber = prevMonthLastDay - (startWeekday - i - 1);
-        final d = DateTime(year, month - 1, dayNumber);
-        final isPast = d.isBefore(DateTime(today.year, today.month, today.day));
-        final isToday = _isSame(d, today);
-        final isSelected = selectedDate != null && _isSame(d, selectedDate!);
-        boxWidgets.add(FutureBuilder<List<CalendarEvent>>(
-          future: getEventsForDate(d),
-          builder: (_, snap) => CalendarDayBox(
-            day: dayNumber,
-            isPast: isPast,
-            isSelected: isSelected,
-            isToday: isToday,
-            date: d,
-            onTap: (dd) => onDayTap(dd),
-            events: snap.data ?? const [],
-          ),
-        ));
-      } else {
-        boxWidgets.add(const CalendarBlankBox());
-      }
+      boxWidgets.add(const CalendarBlankBox());
     }
 
-    // 이번달 날짜
     for (int day = 1; day <= lastDay; day++) {
-      final d = DateTime(year, month, day);
-      final isPast = d.isBefore(DateTime(today.year, today.month, today.day));
-      final isToday = _isSame(d, today);
-      final isSelected = selectedDate != null && _isSame(d, selectedDate!);
+      final thisDay = DateTime(year, month, day);
+      final isPast =
+          thisDay.isBefore(DateTime(today.year, today.month, today.day));
+      final isToday = _isSameDate(thisDay, today);
+      final isSelected =
+          selectedDate != null && _isSameDate(thisDay, selectedDate!);
+      final dayEvents = getEventsForDate(thisDay);
 
-      boxWidgets.add(FutureBuilder<List<CalendarEvent>>(
-        future: getEventsForDate(d),
-        builder: (_, snap) => CalendarDayBox(
-          day: day,
-          isPast: isPast,
-          isSelected: isSelected,
-          isToday: isToday,
-          date: d,
-          onTap: (dd) => onDayTap(dd),
-          events: snap.data ?? const [],
-        ),
+      boxWidgets.add(CalendarDayBox(
+        day: day,
+        isPast: isPast,
+        isSelected: isSelected,
+        isToday: isToday,
+        date: thisDay,
+        onTap: onDayTap,
+        events: dayEvents,
       ));
     }
 
@@ -112,6 +90,7 @@ class CalendarView extends StatelessWidget {
     );
   }
 
-  bool _isSame(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
+  bool _isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
 }
