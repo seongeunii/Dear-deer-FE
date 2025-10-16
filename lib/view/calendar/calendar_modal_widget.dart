@@ -21,7 +21,6 @@ class CustomCalendarWidget extends StatefulWidget {
 
 class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
   late DateTime focusedDay;
-
   final TextStyle _commonTextStyle = TextStyle(color: AppColors.G_06);
 
   @override
@@ -40,16 +39,14 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       calendarFormat: CalendarFormat.month,
       selectedDayPredicate: (day) => isSameDay(day, widget.selectedDate),
       onDaySelected: (selected, focused) {
-        setState(() {
-          focusedDay = focused;
-        });
+        setState(() => focusedDay = focused);
         widget.onDateSelected(selected);
       },
       headerStyle: HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,
-        leftChevronIcon: Icon(Icons.chevron_left),
-        rightChevronIcon: Icon(Icons.chevron_right),
+        leftChevronIcon: const Icon(Icons.chevron_left),
+        rightChevronIcon: const Icon(Icons.chevron_right),
         titleTextFormatter: (date, _) => '${date.year}년 ${date.month}월',
         titleTextStyle: FontStyles.B1_bold_14,
       ),
@@ -67,11 +64,11 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
         defaultTextStyle: _commonTextStyle,
         weekendTextStyle: _commonTextStyle,
         holidayTextStyle: _commonTextStyle,
-        selectedDecoration: BoxDecoration(
+        selectedDecoration: const BoxDecoration(
           color: AppColors.mainRed,
           shape: BoxShape.circle,
         ),
-        selectedTextStyle: TextStyle(
+        selectedTextStyle: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),

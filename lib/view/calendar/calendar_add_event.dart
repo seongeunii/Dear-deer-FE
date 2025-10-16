@@ -49,20 +49,29 @@ class _AddEventState extends State<AddEvent> {
     return SizedBox(
       height: 620.h,
       child: Scaffold(
-        backgroundColor: AppColors.bgColor,
-        appBar: _appBar(),
+        backgroundColor: Colors.transparent,
         body: Container(
-          // 기존 UI 유지
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _titleAndMemoFields(),
-                _dateField(formattedDate),
-                _categoryField(),
-              ],
-            ),
+          decoration: BoxDecoration(
+            color: AppColors.bgColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              _appBar(),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _titleAndMemoFields(),
+                      _dateField(formattedDate),
+                      _categoryField(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -72,7 +81,7 @@ class _AddEventState extends State<AddEvent> {
   PreferredSizeWidget _appBar() {
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: AppColors.bgColor,
+      backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
       titleSpacing: 0,
@@ -90,10 +99,12 @@ class _AddEventState extends State<AddEvent> {
               onTap: () {
                 final title = _titleController.text.trim();
                 if (title.isNotEmpty) {
-                  widget.onAddEvent(_selectedDate, _titleController.text.trim(),
-                      _memoController.text.trim(), _selectedCategory);
-                } else {
-                  // 제목 없으면 에러 처리 or 안내 (선택)
+                  widget.onAddEvent(
+                    _selectedDate,
+                    _titleController.text.trim(),
+                    _memoController.text.trim(),
+                    _selectedCategory,
+                  );
                 }
               },
               child: Text("추가",
@@ -132,11 +143,7 @@ class _AddEventState extends State<AddEvent> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 14.h),
-            child: Divider(
-              thickness: 1,
-              color: AppColors.G_02,
-              height: 1,
-            ),
+            child: Divider(thickness: 1, color: AppColors.G_02, height: 1),
           ),
           TextField(
             controller: _memoController,
@@ -167,9 +174,7 @@ class _AddEventState extends State<AddEvent> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           GestureDetector(
-            onTap: () {
-              setState(() => _showCalendar = !_showCalendar);
-            },
+            onTap: () => setState(() => _showCalendar = !_showCalendar),
             child: Text(
               formattedDate,
               style: FontStyles.B1_bold_15.copyWith(color: AppColors.Black),
@@ -178,11 +183,7 @@ class _AddEventState extends State<AddEvent> {
           if (_showCalendar) ...[
             Padding(
               padding: EdgeInsets.only(top: 14.h),
-              child: Divider(
-                thickness: 1,
-                color: AppColors.G_02,
-                height: 1,
-              ),
+              child: Divider(thickness: 1, color: AppColors.G_02, height: 1),
             ),
             CustomCalendarWidget(
               selectedDate: _selectedDate,
@@ -213,17 +214,13 @@ class _AddEventState extends State<AddEvent> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            "카테고리",
-            style: FontStyles.B1_bold_15.copyWith(color: AppColors.G_05),
-          ),
+          Text("카테고리",
+              style: FontStyles.B1_bold_15.copyWith(color: AppColors.G_05)),
           CategoryDropdown(
             selectedCategory: _selectedCategory,
-            onCategorySelected: (value) {
-              setState(() {
-                _selectedCategory = value;
-              });
-            },
+            onCategorySelected: (value) => setState(() {
+              _selectedCategory = value;
+            }),
           ),
         ],
       ),
